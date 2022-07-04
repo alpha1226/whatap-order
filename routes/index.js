@@ -1,5 +1,5 @@
 const express = require('express')
-const response = require('../service/response')
+const response = require('../util/response')
 
 const router = express.Router()
 
@@ -52,35 +52,6 @@ router.post('/orderProduct', async (req, res) => {
     console.log(err)
     return response.serverError(res, err.message)
   }
-})
-
-router.delete('/deleteOrder/:orderId', async (req, res) => {
-  const { orderId } = req.params
-  // 주문 번호 확인 및 상태 확인
-  const order = await db.getOrder(orderId)
-
-  if (order === null) {
-    return response.serverError(res, 'can not find order')
-  }
-  if (order.status === 'cancled') {
-    return response.send(res, 'already cancled order')
-  }
-  if (order.status !== 'ordered') {
-    return response.serverError(
-      res,
-      `can not cancle this order, already ${order.status}`
-    )
-  }
-
-  // 주문 취소 업데이트
-  const cancleResult = await db.orderCancle(orderId)
-
-  // 각 상품 수량 변경
-  cancleResult.products.forEach(async (e) => {
-    await cancleProductOrder(e.productIndex, e.quantity)
-  })
-
-  return response.json(res, cancleResult)
 })
 
 router.put('/changeOrder/:orderId', async (req, res) => {
@@ -149,6 +120,35 @@ router.put('/changeOrder/:orderId', async (req, res) => {
   )
 
   return response.json(res, updateOrderResult)
+})
+
+router.delete('/deleteOrder/:orderId', async (req, res) => {
+  const { orderId } = req.params
+  // 주문 번호 확인 및 상태 확인
+  const order = await db.getOrder(orderId)
+
+  if (order === null) {
+    return response.serverError(res, 'can not find order')
+  }
+  if (order.status === 'cancled') {
+    return response.send(res, 'already cancled order')
+  }
+  if (order.status !== 'ordered') {
+    return response.serverError(
+      res,
+      `can not cancle this order, already ${order.status}`
+    )
+  }
+
+  // 주문 취소 업데이트
+  const cancleResult = await db.orderCancle(orderId)
+
+  // 각 상품 수량 변경
+  cancleResult.products.forEach(async (e) => {
+    await cancleProductOrder(e.productIndex, e.quantity)
+  })
+
+  return response.json(res, cancleResult)
 })
 
 module.exports = router
