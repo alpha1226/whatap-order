@@ -4,13 +4,13 @@ const productServerUrl = 'http://localhost:3000'
 const getProductUrl = `${productServerUrl}/getProduct/`
 const updateProductUrl = `${productServerUrl}/updateProduct/`
 
-fetch(productServerUrl, { method: 'get' }).then((e) => {
-  if (e.status !== 200) {
-    // eslint-disable-next-line no-process-exit
-    process.exit(1)
-  }
-  console.log('connect product server success')
-})
+fetch(productServerUrl, { method: 'get' })
+  .then((e) => {
+    console.log('connect product server success')
+  })
+  .catch(() => {
+    console.log('connect product server failed')
+  })
 
 async function productValidation(productIndex, quantity) {
   const getProductInfoResult = await fetch(`${getProductUrl}${productIndex}`, {
