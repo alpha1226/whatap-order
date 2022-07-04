@@ -9,7 +9,7 @@ db.on('error', () => {
 })
 
 db.on('open', () => {
-  console.log('Connected!')
+  console.log('mongodb Connected!')
 })
 
 // product를 db object type에서 return object type으로 변경

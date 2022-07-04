@@ -11,6 +11,10 @@ const {
   getProductInfo,
 } = require('../service/product')
 
+router.get('/', (req, res) => {
+  res.send('order server')
+})
+
 router.get('/getOrders', async (req, res) => {
   const orders = await db.getOrders()
   return response.json(res, orders)
