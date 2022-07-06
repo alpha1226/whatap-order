@@ -92,9 +92,9 @@ router.put('/changeOrder/:orderId', async (req, res) => {
 
   const newOrderProducts = productInfo.map((e) => {
     // 주문에 이미 들어가있는 갯수 확인
-    const inOrderQuantity = order.products.find(
-      (r) => r.productIndex === e.productIndex
-    ).quantity
+    const inOrderQuantity =
+      order.products.find((r) => r.productIndex === e.productIndex)?.quantity ||
+      0
 
     const newQuantity = products.find(
       (r) => r.productIndex === e.productIndex
