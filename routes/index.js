@@ -7,7 +7,6 @@ const {
   productValidation,
   productUpdate,
   cancleProductOrder,
-  getProductInfo,
 } = require('../service/product')
 
 router.get('/', (req, res) => {
@@ -35,14 +34,16 @@ router.post('/orderProduct', async (req, res) => {
       )
     )
 
-    if (productValidationResult.includes(false)) {
+    if (
+      productValidationResult.includes(false) ||
+      productValidationResult.includes(undefined)
+    ) {
       throw new Error('failed order product, contains invalid products')
     }
 
     productValidationResult.forEach(async (e) => {
       const newProduct = {
         ...e,
-        productIndex: e.product_index,
         stock: e.stock - products.find((r) => r.id === e.id).quantity,
       }
       await productUpdate(newProduct)
@@ -78,18 +79,18 @@ router.put('/changeOrder/:orderId', async (req, res) => {
   }
 
   // 상품 재고량 확인
-  const productStock = await Promise.all(
+  const productInfo = await Promise.all(
     products.map(async (e) => {
-      const productInfo = await getProductInfo(e.productIndex)
+      const productInfo = await productValidation(e.productIndex)
       return productInfo
     })
   )
 
-  if (productStock.includes(undefined)) {
+  if (productInfo.includes(undefined) || productInfo.includes(false)) {
     return response.serverError(res, '구매가 불가능한 상품이 포함되어있습니다')
   }
 
-  const newOrderProducts = productStock.map((e) => {
+  const newOrderProducts = productInfo.map((e) => {
     // 주문에 이미 들어가있는 갯수 확인
     const inOrderQuantity = order.products.find(
       (r) => r.productIndex === e.productIndex

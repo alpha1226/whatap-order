@@ -23,15 +23,12 @@ async function productValidation(productIndex, quantity) {
     return false
   }
 
-  return {
-    ...productInfo,
-    productIndex: productInfo.product_index,
-  }
+  return productInfo
 }
 
 async function productUpdate(product) {
   const updateResult = await fetch(
-    `${updateProductUrl}${product.product_index}`,
+    `${updateProductUrl}${product.productIndex}`,
     {
       method: 'put',
       headers: {
@@ -56,7 +53,6 @@ async function cancleProductOrder(productIndex, quantity) {
   if (product.object) {
     product = product.object
   }
-  product.productIndex = product.product_index
   product.stock += quantity
 
   const updateResult = await fetch(`${updateProductUrl}${productIndex}`, {
