@@ -28,13 +28,21 @@ async function productValidation(productIndex, quantity) {
 }
 
 async function productUpdate(product) {
-  await fetch(`${updateProductUrl}${product.product_index}`, {
-    method: 'put',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(product),
-  })
+  const updateResult = await fetch(
+    `${updateProductUrl}${product.product_index}`,
+    {
+      method: 'put',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(product),
+    }
+  )
+  if (updateResult.status !== 200) throw new Error('update failed')
+  console.log(await updateResult.json())
+  if ((await updateResult.json()).result === false) {
+    throw new Error('update failed')
+  }
   return true
 }
 

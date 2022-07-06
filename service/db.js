@@ -12,7 +12,6 @@ db.on('open', () => {
   console.log('mongodb Connected!')
 })
 
-// product를 db object type에서 return object type으로 변경
 function productSpread(r) {
   return {
     productIndex: r.productIndex,
@@ -20,7 +19,6 @@ function productSpread(r) {
   }
 }
 
-// order를 db object type에서 return object type으로 변경
 function orderSpread(r) {
   return {
     id: r.id,

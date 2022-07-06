@@ -1,9 +1,8 @@
 const express = require('express')
-const response = require('../util/response')
-
 const router = express.Router()
 
 const db = require('../service/db')
+const response = require('../util/response')
 const {
   productValidation,
   productUpdate,
