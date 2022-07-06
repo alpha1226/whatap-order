@@ -13,18 +13,20 @@ fetch(productServerUrl, { method: 'get' })
   })
 
 async function productValidation(productIndex, quantity) {
-  const getProductInfoResult = await fetch(`${getProductUrl}${productIndex}`, {
+  const productInfoResult = await fetch(`${getProductUrl}${productIndex}`, {
     method: 'get',
   })
+  if (productInfoResult.status !== 200) return undefined
 
-  if (getProductInfoResult.status !== 200) return false
-
-  const product = await getProductInfoResult.json()
-
-  if (product.available && product.stock >= quantity) {
-    return product
+  const productInfo = await productInfoResult.json()
+  if (!productInfo.available || productInfo.stock < quantity) {
+    return false
   }
-  return false
+
+  return {
+    ...productInfo,
+    productIndex: productInfo.product_index,
+  }
 }
 
 async function productUpdate(product) {
@@ -39,7 +41,7 @@ async function productUpdate(product) {
     }
   )
   if (updateResult.status !== 200) throw new Error('update failed')
-  console.log(await updateResult.json())
+
   if ((await updateResult.json()).result === false) {
     throw new Error('update failed')
   }
@@ -67,24 +69,8 @@ async function cancleProductOrder(productIndex, quantity) {
   return updateResult
 }
 
-async function getProductInfo(productIndex) {
-  const productInfoResult = await fetch(`${getProductUrl}${productIndex}`, {
-    method: 'get',
-  })
-  if (productInfoResult.status !== 200) return undefined
-
-  const productInfo = await productInfoResult.json()
-  if (productInfo.available === false) return undefined
-
-  return {
-    ...productInfo,
-    productIndex: productInfo.product_index,
-  }
-}
-
 module.exports = {
   productValidation,
   productUpdate,
   cancleProductOrder,
-  getProductInfo,
 }
